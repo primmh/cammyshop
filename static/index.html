@@ -201,7 +201,7 @@
 .nav-section-label{color:var(--brown-soft) !important}
 table th{background:var(--cream-dark) !important}
 table tbody tr:hover{background:var(--red-pale) !important}
-.shop-topbar{background:var(--topbar-bg) !important;border-color:rgba(var(--ac),0.12) !important}
+.shop-topbar{background:var(--topbar-bg) !important;border-color:rgba(var(--ac),0.12) !important}.shop-sort-select{background:var(--cream-card) !important;color:var(--brown-mid) !important;border-color:rgba(var(--ac),0.18) !important}
 .shop-sidebar{background:var(--cream) !important;border-color:rgba(var(--ac),0.14) !important}
 
 /* Smooth theme transition */
@@ -912,8 +912,12 @@ tbody tr:hover{background:rgba(180,100,60,.025)}
 /* ── SHOP PAGE ── */
 .shop-sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--cream);border-right:1.5px solid rgba(180,100,60,0.14);z-index:100;display:none;flex-direction:column;padding:0 0 24px;transition:var(--tr);box-shadow:2px 0 20px rgba(180,100,60,0.08)}
 .shop-sidebar.shop-active{display:flex}
-.shop-topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:rgba(240,244,235,.94);backdrop-filter:blur(16px);border-bottom:1.5px solid rgba(180,100,60,0.12);display:none;align-items:center;padding:0 32px;z-index:90;gap:16px;transition:left .35s cubic-bezier(.4,0,.2,1)}
+.shop-topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;background:rgba(240,244,235,.94);backdrop-filter:blur(16px);border-bottom:1.5px solid rgba(180,100,60,0.12);display:none;flex-direction:column;padding:0;z-index:90;transition:left .35s cubic-bezier(.4,0,.2,1)}
 .shop-topbar.shop-active{display:flex}
+.shop-topbar-row1{display:flex;align-items:center;gap:12px;padding:0 28px;height:var(--topbar-h);width:100%}
+.shop-topbar-row2{display:none;padding:0 16px 10px;width:100%}
+.shop-topbar-right{display:flex;align-items:center;gap:10px;margin-left:auto;flex-shrink:0}
+.shop-sort-select{padding:7px 12px;border-radius:50px;border:1.5px solid rgba(var(--ac),0.18);background:var(--cream-card);color:var(--brown-mid);font-family:'Jost',sans-serif;font-size:12.5px;font-weight:500;cursor:pointer;outline:none;flex-shrink:0}
 .shop-main{margin-left:var(--sidebar-w);padding-top:var(--topbar-h);min-height:100vh;transition:margin-left .35s}
 .shop-page{display:none;padding:36px 40px 60px;animation:vFade .4s ease}
 .shop-page.active{display:block}
@@ -947,11 +951,28 @@ tbody tr:hover{background:rgba(180,100,60,.025)}
 @media(max-width:900px){
   .shop-sidebar{transform:translateX(-100%)}
   .shop-sidebar.open{transform:translateX(0);box-shadow:4px 0 32px rgba(61,32,21,.12)}
-  .shop-topbar{left:0;padding:0 20px}
-  .shop-main{margin-left:0}
-  .shop-page{padding:24px 20px 48px}
+  .shop-topbar{left:0}
+  .shop-topbar-row1{padding:0 16px}
+  .shop-topbar-row2{display:flex}
+  .shop-main{margin-left:0;padding-top:calc(var(--topbar-h) + 46px)}
+  .shop-page{padding:20px 16px 60px}
+  .shop-search-wrap{max-width:100%}
+  .shop-sort-select{font-size:11.5px;padding:6px 10px}
+  .topbar-uname{display:none}
+  .shop-hero{padding:28px 24px;margin-bottom:20px}
+  .shop-hero-title{font-size:clamp(22px,6vw,32px)}
+  .shop-hero-desc{font-size:13px}
+  .notice-bar{font-size:12px;padding:10px 14px}
+  .subfilter-bar{gap:6px;margin-bottom:16px}
+  .subfilter-btn{padding:6px 12px;font-size:12px}
 }
-@media(max-width:640px){.shop-grid{grid-template-columns:1fr}}
+@media(max-width:640px){
+  .shop-grid{grid-template-columns:1fr}
+  .topbar-title{font-size:18px}
+}
+@media(max-width:420px){
+  .shop-sort-select{display:none}
+}
 
 /* ── FORGOT PASSWORD ── */
 .fp-steps{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:28px}
@@ -3184,7 +3205,7 @@ function renderShopGrid(){
   }).join('');
 }
 
-function shopLogout(){currentUser=null;ss('cd_user_session',null);switchView('landing')}
+function shopLogout(){currentUser=null;ss('cd_user_session',null);const si=document.getElementById('shopSearchInput');if(si)si.value='';shopSearch='';switchView('landing')}
 function shopOpenMobile(){document.getElementById('shopSidebar').classList.add('open');document.getElementById('shopOverlay').classList.add('show')}
 function shopCloseMobile(){document.getElementById('shopSidebar').classList.remove('open');document.getElementById('shopOverlay').classList.remove('show')}
 
@@ -4118,21 +4139,25 @@ setInterval(async()=>{
 
     <!-- Shop Topbar -->
     <div class="shop-topbar">
-      <button class="hamburger" onclick="shopOpenMobile()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
-      <div class="topbar-title">Shop</div>
-      <div class="shop-search-wrap">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="shopSearchInput" placeholder="Search products, boosts, load…" oninput="shopSearch=this.value;renderShopGrid()">
+      <div class="shop-topbar-row1">
+        <button class="hamburger" onclick="shopOpenMobile()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <div class="topbar-title">Shop</div>
+        <div class="shop-topbar-right">
+          <select id="shopSortSelect" class="shop-sort-select" onchange="shopSort=this.value;renderShopGrid()">
+            <option value="default">Default</option>
+            <option value="high-low">Price: High → Low</option>
+            <option value="low-high">Price: Low → High</option>
+          </select>
+          <div class="topbar-av-row">
+            <div class="topbar-av-sm" id="shopUserAvatar">U</div>
+            <span class="topbar-uname" id="shopUserAvatarName"></span>
+          </div>
+        </div>
       </div>
-      <select id="shopSortSelect" onchange="shopSort=this.value;renderShopGrid()" style="padding:8px 12px;border-radius:50px;border:1.5px solid rgba(var(--ac),0.18);background:var(--cream-card);color:var(--brown-mid);font-family:'Jost',sans-serif;font-size:12.5px;font-weight:500;cursor:pointer;outline:none;flex-shrink:0">
-        <option value="default">Default</option>
-        <option value="high-low">Price: High → Low</option>
-        <option value="low-high">Price: Low → High</option>
-      </select>
-      <div class="topbar-actions">
-        <div class="topbar-av-row">
-          <div class="topbar-av-sm" id="shopUserAvatar">U</div>
-          <span class="topbar-uname" id="shopUserAvatarName"></span>
+      <div class="shop-topbar-row2">
+        <div class="shop-search-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="shopSearchInput" placeholder="Search products, boosts, load…" oninput="shopSearch=this.value;renderShopGrid()">
         </div>
       </div>
     </div>
